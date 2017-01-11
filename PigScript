@@ -1,0 +1,38 @@
+grunt> PETROL = LOAD '/home/acadgild/Onkar/Session09/Assignment1/PetrolDataset.txt' USING PigStorage(',') AS (District:chararray,DistName:chararray,buy:chararray,sell:chararray,volumeIN:int,volumeOUT:int,year:int);
+
+
+1)
+
+
+grunt> GRP_PETROL = GROUP PETROL BY DistName;
+
+grunt> SUM_PETROL = FOREACH GRP_PETROL GENERATE PETROL.District AS DistributorID, (chararray)$0 AS Distributor, SUM(PETROL.volumeOUT) AS soldPetrol;
+
+grunt> DUMP SUM_PETROL;
+2)
+
+grunt> ORDER_SUM_PETROL = ORDER SUM_PETROL BY soldPetrol DESC;
+
+
+grunt> TOP_DIST = FOREACH ORDER_SUM_PETROL GENERATE FLATTEN(DistributorID),Distributor,soldPetrol;
+
+
+grunt> TOP10_DIST = LIMIT TOP_DIST 10;
+
+grunt> DUMP TOP10_DIST;
+3)
+
+grunt> YEAR_PETROL = FOREACH ORDER_SUM_PETROL GENERATE PETROL.year,FLATTEN(DistributorID);
+
+grunt> DUMP YEAR_PETROL;
+4)
+
+grunt> MIN_SUM_PETROL = ORDER SUM_PETROL BY soldPetrol ASC;
+
+
+grunt> BOT_DIST = FOREACH MIN_SUM_PETROL GENERATE FLATTEN(DistributorID),Distributor,soldPetrol;
+
+
+grunt> BOT1_DIST = LIMIT BOT_DIST 1;
+grunt> DUMP BOT1_DIST;
+
